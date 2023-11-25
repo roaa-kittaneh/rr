@@ -3,105 +3,118 @@ import Input from '../../pages/Input';
 import { useFormik } from 'formik';
 import {registerSchema} from'../validate/Validate.js'
 import {  toast } from 'react-toastify';
-export default function Register() {
-    const initialValues = {
-        userName: '',
-        email: '',
-        password: '',
-        image: null, 
+
+function Register() {
+  const initialValues = {
+    userName: "",
+    email: "",
+    password: "",
+    image: "",
+  };
+
+  const handelFieldChange = (event) => {
+    formik.setFieldValue("image", event.target.files[0]);
+  };
+
+  const onSubmit = async (users) => {
+    const formData = new FormData();
+    formData.append("userName", users.userName);
+    formData.append("email", users.email);
+    formData.append("password", users.password);
+    formData.append("image", users.image);
+
+    const { data } = await axios.post(
+      `https://ecommerce-node4.vercel.app/auth/signup `,
+      formData
+    );
+    console.log(data);
+    if (data.message === "success") {
+      formik.resetForm();
+      toast("Account Created Successfully, make sure to verify your email", {
+        position: "top-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
-    
-   
-    const onSubmit = async (users) => {
-        // const formData = new FormData();
-        // formData.append("userName", users.userName);
-        // formData.append("email", users.email);
-        // formData.append("password", users.password);
-        // formData.append("image", users.image);
-    
-        // const { data } = await axios.post(`https://ecommerce-node4.vercel.app/auth/signup`, formData);
-        // if(data.message=='success'){
-        //     toast.success('account created successfly', {
-        //         position: "top-right",
-        //         autoClose: 5000,
-        //         hideProgressBar: false,
-        //         closeOnClick: true,
-        //         pauseOnHover: true,
-        //         draggable: true,
-        //         progress: undefined,
-        //         theme: "light",
-        //         });
-        // }
-        // console.log(data);
-    }
-    
-    const test = e =>{
-        console.log(e);
-    }
+  };
+
   const formik = useFormik({
     initialValues,
     onSubmit,
-    validationSchema:registerSchema
+    validationSchema: registerSchema,
   });
 
-  const inputs = [
+  const Inputs = [
     {
-      id: 'username',
-      type: 'text',
-      name: 'userName',
-      title: 'user name',
+      id: "username",
+      type: "text",
+      name: "userName",
+      title: "Username",
       value: formik.values.userName,
-      errors: formik.errors,
     },
     {
-      id: 'email',
-      type: 'email',
-      name: 'email',
-      title: 'user email',
+      id: "email",
+      type: "email",
+      name: "email",
+      title: "Email",
       value: formik.values.email,
-      errors: formik.errors,
     },
     {
-      id: 'password',
-      type: 'password',
-      name: 'password',
-      title: 'user password',
+      id: "password",
+      type: "password",
+      name: "password",
+      title: "Password",
       value: formik.values.password,
-      errors: formik.errors,
     },
     {
-        id: 'image',
-        type: 'file',
-        name: 'image', 
-        title: 'user image',
-        onChange: test,
+      id: "image",
+      type: "file",
+      name: "image",
+      title: "User Image",
+      onChange: handelFieldChange,
     },
-    
   ];
-  
 
-  const renderInput = inputs.map((input, index) => (
-    <Input
-      type={input.type}
-      id={input.id}
-      name={input.name}
-      title={input.title}
-      key={index}
-      errors={input.errors}
-      onChange={input.onChange || formik.handleChange}  
-      onBlur={formik.handleBlur}
-      touched={formik.touched}
-    />
+  const renderInputs = Inputs.map((input, index) => (
+    <div key={index} className="mb-4">
+      <Input
+        type={input.type}
+        id={input.id}
+        name={input.name}
+        title={input.title}
+        value={input.value}
+        onChange={input.onChange || formik.handleChange}
+        onBlur={formik.handleBlur}
+        touched={formik.touched}
+      />
+      {formik.touched[input.name] && formik.errors[input.name] && (
+        <div className="text-danger mt-1">{formik.errors[input.name]}</div>
+      )}
+    </div>
   ));
+
   return (
-    <>
-      <div className='container'>
-        <h2>Create Account</h2>
+    <div>
+      <div>
+        <h2>Register</h2>
         <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
-          {renderInput}
-         <button type='submit' disabled={!formik.isValid}> Register</button>
+          {renderInputs}
+
+          <button
+            type="submit"
+            disabled={!formik.isValid}
+          >
+            Register
+          </button>
         </form>
       </div>
-    </>
+    </div>
   );
 }
+
+export default Register;
