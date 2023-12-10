@@ -1,43 +1,34 @@
-import React, { useContext } from 'react';
+import React  from 'react';
 import Input from '../../pages/Input';
 import { useFormik } from 'formik';
-import { loginSchema } from '../validate/Validate.js';
+import { SendcodeSchema } from '../validate/Validate.js';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';  // Add this line
-import { UserContext } from '../context/User.jsx';
-import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom'; 
 import { useState } from 'react';
 
-function Login() {
+function Sendcode() {
   const navigate = useNavigate();
 
-  let {userToken,setUserToken}=useContext(UserContext);
   
-  if(userToken){
-    navigate(-1);
-  }
   // Move formik declaration outside the hook
   const formik = useFormik({
     initialValues: {
       email: '',
-      password: '',
+      
     },
     onSubmit: async (users) => {
       try {
-        const { data } = await axios.post(
-          `https://ecommerce-node4.vercel.app/auth/signin`,
+        const { data } = await axios.patch(
+          `https://ecommerce-node4.vercel.app/auth/sendcode`,
           users
         );
 
         if (data.message === 'success') {
-            localStorage.setItem('userToken', data.token);
-            setUserToken(data.token);
-
+            
          // saveCurrentUser(); // This is where the error occurs
           formik.resetForm();
-          toast.success('Log in is successful', {
+          toast.success('input code', {
             position: 'top-right',
             autoClose: false,
             hideProgressBar: false,
@@ -47,14 +38,14 @@ function Login() {
             progress: undefined,
             theme: 'dark',
           });
-          navigate('/');
+          navigate('/forgetpassword');
         }
       } catch (error) {
         console.error('Error during login:', error);
         toast.error('An error occurred during login');
       }
     },
-    validationSchema: loginSchema,
+    validationSchema:  SendcodeSchema,
   });
 
   const Inputs = [
@@ -65,13 +56,7 @@ function Login() {
       title: 'Email',
       value: formik.values.email,
     },
-    {
-      id: 'password',
-      type: 'password',
-      name: 'password',
-      title: 'Password',
-      value: formik.values.password,
-    },
+    
   ];
 
   const renderInputs = Inputs.map((input, index) => (
@@ -91,26 +76,21 @@ function Login() {
       )}
     </div>
   ));
-  const [showForget, setShowForget] = useState(false); // Add state variable to track forget visibility
-
-  const handleForgetClick = () => {
-    setShowForget(true);
-  };
+  
 
   return (
     <div>
       <div>
-        <h2>Log in</h2>
+        <h2>send code</h2>
         <form onSubmit={formik.handleSubmit}>
           {renderInputs}
 
           <button type="submit" disabled={!formik.isValid}>
-            Log in
+            send code
           </button>
-          <Link to='/sendcode'>forget password</Link>
         </form>
       </div>
     </div>
   );
 }
-export default Login;
+export default Sendcode;

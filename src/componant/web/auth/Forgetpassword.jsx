@@ -1,37 +1,32 @@
 import React from 'react';
 import Input from '../../pages/Input';
 import { useFormik } from 'formik';
-import {registerSchema} from'../validate/Validate.js'
+import {ForgetpasswordSchema} from'../validate/Validate.js'
 import axios from 'axios';
 import {  toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
-function Register() {
+function Forgetpassword() {
+    const navigate = useNavigate();
+
   const initialValues = {
-    userName: "",
     email: "",
     password: "",
-    image: "",
+    code:"",
   };
 
-  const handelFieldChange = (event) => {
-    formik.setFieldValue("image", event.target.files[0]);
-  };
+  
 
   const onSubmit = async (users) => {
-    const formData = new FormData();
-    formData.append("userName", users.userName);
-    formData.append("email", users.email);
-    formData.append("password", users.password);
-    formData.append("image", users.image);
-
-    const { data } = await axios.post(
-      `https://ecommerce-node4.vercel.app/auth/signup `,
-      formData
+   
+    const { data } = await axios.patch(
+      `${import.meta.env.VITE_API_URL}/auth/forgotPassword `,
+      users
     );
     console.log(data);
     if (data.message === "success") {
-      formik.resetForm();
-      toast.success("Account Created Successfully, make sure to verify your email", {
+      
+      toast.success("passsword update", {
         position: "top-right",
         autoClose: false,
         hideProgressBar: false,
@@ -40,25 +35,20 @@ function Register() {
         draggable: true,
         progress: undefined,
         theme: "dark",
+
       });
-      
+      navigate('/login');
     }
   };
 
   const formik = useFormik({
     initialValues,
     onSubmit,
-    validationSchema: registerSchema,
+    validationSchema: ForgetpasswordSchema,
   });
 
   const Inputs = [
-    {
-      id: "username",
-      type: "text",
-      name: "userName",
-      title: "Username",
-      value: formik.values.userName,
-    },
+    
     {
       id: "email",
       type: "email",
@@ -73,13 +63,15 @@ function Register() {
       title: "Password",
       value: formik.values.password,
     },
+    
     {
-      id: "image",
-      type: "file",
-      name: "image",
-      title: "User Image",
-      onChange: handelFieldChange,
-    },
+        id: "code",
+        type: "text",
+        name: "code",
+        title: "code",
+        value: formik.values.code,
+      },
+      
   ];
 
   const renderInputs = Inputs.map((input, index) => (
@@ -103,7 +95,7 @@ function Register() {
   return (
     <div>
       <div>
-        <h2>Register</h2>
+        <h2>forgotPassword</h2>
         <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
           {renderInputs}
 
@@ -119,4 +111,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default Forgetpassword;
