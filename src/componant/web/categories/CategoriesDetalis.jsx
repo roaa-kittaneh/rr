@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import ReactImageMagnify from 'react-image-magnify';
+
 
 export default function CategoriesDetalis() {
     const {categoryId}=useParams();
